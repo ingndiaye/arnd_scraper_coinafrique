@@ -10,7 +10,7 @@ import streamlit.components.v1 as components
 
 
 st.markdown("""<style>body {background-color: #0f926d;} .stApp { background-color: #0f926d; } </style>""", unsafe_allow_html=True)
-st.markdown("<h5 style='text-align: center; color: white';>🕷️ SCRAPING SUR EXPAT-DAKAR AVEC SELENIUM ET WEB-SCRAPER 🕷️</h5>", unsafe_allow_html=True) 
+st.markdown("<h5 style='text-align: center; color: white';>🕷️ SCRAPING SUR coinafrique COINAFRIQUE AVEC BEAUTIFULSOUP ET WEB-SCRAPER 🕷️</h5>", unsafe_allow_html=True) 
 
 st.markdown(""" <style>
             .main {
@@ -41,8 +41,7 @@ def charger_dataframe(dataframe,nom_fichier, titre_bt, id_bt, key_bt_dwn,type_sc
 
     if st.button(titre_bt,id_bt): 
 
-        st.write('Données "'+titre_bt+'" Scrapées avec '+type_screping)
-        dataframe['prix_nettoye'] = dataframe['prix'].apply(nettoyerprix)
+        st.write('Données "'+titre_bt+'" Scrapées avec '+type_screping) 
         st.dataframe(dataframe)
         st.write('Dimension des donnée: ' + str(dataframe.shape[0]) + ' ligne et ' + str(dataframe.shape[1]) + ' colonnes.')
 
@@ -66,8 +65,8 @@ def scraper_donnees_expat(nbrepage,produits):
         #containers = soup.find_all('div', class_ = 'card ad__card round small hoverable  undefined ')
         containers = soup.find_all('div', class_ = 'col s6 m4 l3')
         print("conteneur",len(containers))
-        data = []
-        for container in containers[:6]:
+
+        for container in containers :
         #for container in containers:
             try:
                 print("de dans") 
@@ -79,10 +78,12 @@ def scraper_donnees_expat(nbrepage,produits):
                 detail = container.find('p', class_ = "ad__card-description").text
                 print(detail)
                 #Prix du produit
-                price = soup_container.find('p', class_='price').text.replace("CFA", "").replace(" ", "")
-                prix = float(price) 
-                
-                print("price", price)
+                try :
+                     price = soup_container.find('p', class_='price').text.replace("CFA", "").replace(" ", "")
+                     prix = float(price) 
+                except: 
+                    prix=np.nan                      
+                print("price", prix)
 
                 #ur de l'image
                 img_brute = container.find('img', class_='ad__card-img')
@@ -94,12 +95,11 @@ def scraper_donnees_expat(nbrepage,produits):
                     if abrt and abrt.has_attr('data-address'): 
                         adresse = abrt['data-address'] 
                     
-                inner_spans = abrt.find_all('span')
-                if len(inner_spans) >= 1:
-                    texte = inner_spans[-1].text.strip() 
-                    print("Texte trouvé :", texte) 
+                spans_in = abrt.find_all('span')
+                if len(spans_in) >= 1:
+                    Type = spans_in[-1].text.strip()  
                 else :
-                    texte=None    
+                    Type=None    
                 #adresse = soup_container.find('div', class_ = "row valign-wrapper extra-info-ad-detail").split('<span') # Localisation
                 print("adresse", adresse) 
                 # adresseR = soup_container.find('span', class_ = "listing-item__address-location").text # Region
@@ -108,7 +108,7 @@ def scraper_donnees_expat(nbrepage,produits):
             
                 print("img_url", img_url)
                 dic = {
-                    'Detail': texte+' : '+ detail,
+                    'Type': Type+' : '+ detail,
                     'Prix': prix,
                     'Adresse': adresse, 
                     'Url_Image': img_url
