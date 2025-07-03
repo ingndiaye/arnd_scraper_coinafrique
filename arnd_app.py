@@ -56,16 +56,16 @@ def charger_dataframe(dataframe,nom_fichier, titre_bt, id_bt, key_bt_dwn,type_sc
 st.markdown('''<style> .stButton>button {font-size: 12px; height: 3em; width: 23em;} .stButton>button:hover { background-color: #45a049; color: white; cursor: pointer;}</style>''', unsafe_allow_html=True)
 
 def scraper_donnees_coinaf(nbrepage,produits):
-    print(nbrepage)
+     
     data = []  
+
     for p in range(1,nbrepage+1):
         url = f'https://sn.coinafrique.com/categorie/{produits}?page={p}'
         print(url)
         content_page  = get(url) # récupérere le contenu code de la page
         soup = bs(content_page.text, "html.parser") # soup = le contenu de la page dans un objet beautifulSoup
         
-        # containers  containers = soup.find_all('div', class_ = 'col s6 m4 l3')
-        #containers = soup.find_all('div', class_ = 'card ad__card round small hoverable  undefined ')
+        
         containers = soup.find_all('div', class_ = 'col s6 m4 l3')
         print("conteneur",len(containers))
 
@@ -76,8 +76,8 @@ def scraper_donnees_coinaf(nbrepage,produits):
                 url_container = "https://sn.coinafrique.com" + container.find('a')['href']
                 res_container = get(url_container)
                 soup_container = bs(res_container.text, "html.parser")
-                #print(soup_container.title)
-                #Titre du produit
+                 
+                #Titre de l'annonce
                 detail = container.find('p', class_ = "ad__card-description").text
                 print(detail)
                 #Prix du produit
@@ -85,8 +85,7 @@ def scraper_donnees_coinaf(nbrepage,produits):
                      price = soup_container.find('p', class_='price').text.replace("CFA", "").replace(" ", "")
                      prix = float(price) 
                 except: 
-                    prix=np.nan                      
-                print("price", prix)
+                    prix=np.nan        
 
                 #ur de l'image
                 img_brute = container.find('img', class_='ad__card-img')
@@ -97,19 +96,15 @@ def scraper_donnees_coinaf(nbrepage,produits):
                 for abrt in adrbrute:
                     if abrt and abrt.has_attr('data-address'): 
                         adresse = abrt['data-address'] 
-                    
+
+                #Récupèrer le Type     
                 spans_in = abrt.find_all('span')
                 if len(spans_in) >= 1:
                     Type = spans_in[-1].text.strip()  
                 else :
-                    Type=None    
-                #adresse = soup_container.find('div', class_ = "row valign-wrapper extra-info-ad-detail").split('<span') # Localisation
-                print("adresse", adresse) 
-                # adresseR = soup_container.find('span', class_ = "listing-item__address-location").text # Region
-                # adresse= adresseL+" "+adresseR
-                    
-            
-                print("img_url", img_url)
+                    Type=None     
+
+                
                 dic = {
                     'Type': Type+' : '+ detail,
                     'Prix': prix,
@@ -208,8 +203,6 @@ elif choix == 'Télécharger les données existantes':
     charger_dataframe(dtfrm_vetem_enf, 'Vetements_Enfant', 'Vetements pour Enfant', '7', '17','Web-Scraper') 
     charger_dataframe(dtfrm_chaus_hom,'Chaussures_Homme', 'Chaussures pour Hommer', '8', '18','Web-Scraper')  
     charger_dataframe(dtfrm_vetem_hom,'Vetements_Homme', 'Vetements pour Homme', '5', '15','Web-Scraper')
-
-
 
 else :
     components.html("""<iframe src="https://ee.kobotoolbox.org/single/70d6ca332ba1f4bef90ecd2d461db7a6" width="700" height="1000"</iframe>""",height=1100,width=800)
