@@ -21,7 +21,7 @@ st.markdown(""" <style>
         </style>""", unsafe_allow_html=True)
 
 st.markdown(""" <style> section[data-testid="stSidebar"] {background-color: #b2f7e9; }  
-                 .sidebar-caption { position: relative; top: 200px;  font-size: 18px; text-align: center; color: #666; } 
+                 .sidebar-caption { position: relative; top: 200px;  font-size: 16px; text-align: center; color: #666; } 
                 </style> """, unsafe_allow_html=True)
 
 st.sidebar.markdown( """ <div style='text-align: center; bottom: 30px;font-weight: bold; font-size: 20px;'>  <b> ☰  Menu</b>  </div> """, unsafe_allow_html=True)
