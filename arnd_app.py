@@ -10,7 +10,7 @@ import streamlit.components.v1 as components
 
 
 st.markdown("""<style>body {background-color: #0f926d;} .stApp { background-color: #0f926d; } </style>""", unsafe_allow_html=True)
-st.markdown("<h5 style='text-align: center; color: white';>🕷️ SCRAPING SUR coinafrique COINAFRIQUE AVEC BEAUTIFULSOUP ET WEB-SCRAPER 🕷️</h5>", unsafe_allow_html=True) 
+st.markdown("<h5 style='text-align: center; color: white';>🕷️ SCRAPING SUR COINAFRIQUE AVEC BEAUTIFULSOUP ET WEB-SCRAPER 🕷️</h5>", unsafe_allow_html=True) 
 
 st.markdown(""" <style>
             .main {
@@ -26,8 +26,9 @@ st.markdown(""" <style> section[data-testid="stSidebar"] {background-color: #b2f
 
 st.sidebar.markdown( """ <div style='text-align: center; bottom: 30px;font-weight: bold; font-size: 20px;'>  <b> ☰  Menu</b>  </div> """, unsafe_allow_html=True)
  
-choix = st.sidebar.selectbox('Choisir une action', ['Tableau de bord','Scraper vetements-homme','Scraper chaussures-homme','Scraper vetements-enfants', 'Scraper chaussures-enfants','Télécharger les données existantes', 'Formulaire évalution'])
+choix = st.sidebar.selectbox('Choisir une action', ['Tableau de bord','Scraper Vetements homme','Scraper Chaussures homme','Scraper Vetements enfant', 'Scraper Chaussures enfant','Télécharger les données existantes', 'Formulaire évalution'])
 nbre_pages = st.sidebar.selectbox('Nombre de pages', list([int(nbr) for nbr in np.arange(1, 350)]))
+nbr_articles_page = st.sidebar.number_input("Nombre max d'articles par page", min_value=10, max_value=100, value=10, step=1)
 
 st.sidebar.markdown("""
 <div class="sidebar-caption">
@@ -48,11 +49,13 @@ def charger_dataframe(dataframe,nom_fichier, titre_bt, id_bt, key_bt_dwn,type_sc
         st.download_button(
             label='Télécharger les données',
             data=dataframe.to_csv().encode('utf-8'),
-            file_name=nom_fichier+'.xlsx',
+            file_name=nom_fichier+'.csv',
             mime='text/csv',
             key = key_bt_dwn)
-        
-def scraper_donnees_expat(nbrepage,produits):
+# définir quelques styles liés aux box
+st.markdown('''<style> .stButton>button {font-size: 12px; height: 3em; width: 23em;} .stButton>button:hover { background-color: #45a049; color: white; cursor: pointer;}</style>''', unsafe_allow_html=True)
+
+def scraper_donnees_coinaf(nbrepage,produits):
     print(nbrepage)
     data = []  
     for p in range(1,nbrepage+1):
@@ -66,7 +69,7 @@ def scraper_donnees_expat(nbrepage,produits):
         containers = soup.find_all('div', class_ = 'col s6 m4 l3')
         print("conteneur",len(containers))
 
-        for container in containers :
+        for container in containers[:nbr_articles_page+1] :
         #for container in containers:
             try:
                 print("de dans") 
@@ -179,19 +182,19 @@ if  choix == 'Tableau de bord':
     plt.yticks(fontsize=18)
     st.pyplot(plot2)
  
-elif choix=='Scraper vetements-homme': 
-    dtfrm = scraper_donnees_expat(nbre_pages,'vetements-homme') 
+elif choix=='Scraper Vetements homme': 
+    dtfrm = scraper_donnees_coinaf(nbre_pages,'vetements-homme') 
     charger_dataframe(dtfrm,'Vetements-homme', 'Vétements pour Homme', '1', '11','BeautifulSoup')
 
-elif choix=='Scraper chaussures-homme': 
-    dtfrm = scraper_donnees_expat(nbre_pages,'chaussures-homme') 
+elif choix=='Scraper Chaussures homme': 
+    dtfrm = scraper_donnees_coinaf(nbre_pages,'chaussures-homme') 
     charger_dataframe(dtfrm, 'chaussures-homme','Chaussurespour Homme', '2', '12','BeautifulSoup')   
-elif choix=='Scraper vetements-enfants': 
-    dtfrm = scraper_donnees_expat(nbre_pages,'vetements-enfants') 
+elif choix=='Scraper Vetements enfant': 
+    dtfrm = scraper_donnees_coinaf(nbre_pages,'vetements-enfants') 
     charger_dataframe(dtfrm, 'vetements-enfants', 'Vetementspour enfants', '3', '13','BeautifulSoup')    
 
-elif choix=='Scraper chaussures-enfants': 
-    dtfrm = scraper_donnees_expat(nbre_pages,'chaussures-enfants') 
+elif choix=='Scraper Chaussures enfant': 
+    dtfrm = scraper_donnees_coinaf(nbre_pages,'chaussures-enfants') 
     charger_dataframe(dtfrm,'chaussures-enfants', 'Chaussures pour enfants', '4', '14','BeautifulSoup')
 
 elif choix == 'Télécharger les données existantes': 
