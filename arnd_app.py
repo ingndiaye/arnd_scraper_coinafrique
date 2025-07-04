@@ -34,28 +34,32 @@ st.sidebar.markdown("""
 def charger_dataframe(dataframe,nom_fichier, titre_bt, id_bt, key_bt_dwn,type_screping) :
     st.markdown(""" <style> div.stButton {text-align:center; } </style>""", unsafe_allow_html=True)
 
-    if st.button(titre_bt,id_bt): 
-
+    if st.button(titre_bt,id_bt):
         st.write('Données "'+titre_bt+'" Scrapées avec '+type_screping) 
         st.write('Tailles des donnée: ' + str(dataframe.shape[0]) + ' ligne et ' + str(dataframe.shape[1]) + ' colonnes.')
-        st.dataframe(dataframe)
+        st.dataframe(dataframe) 
+
+def charger_dataframe_BS(dataframe,nom_fichier, titre_bt, id_bt, key_bt_dwn,type_screping) :
+    st.markdown(""" <style> div.stButton {text-align:center; } </style>""", unsafe_allow_html=True)
+    st.write('Données "'+titre_bt+'" Scrapées avec '+type_screping) 
+    st.write('Tailles des donnée: ' + str(dataframe.shape[0]) + ' ligne et ' + str(dataframe.shape[1]) + ' colonnes.')    
+    st.dataframe(dataframe)            
 
 st.markdown('''<style> .stButton>button {font-size: 12px; height: 3em; width: 23em;} .stButton>button:hover { background-color: #0f926d; color: white; cursor: pointer;}</style>''', unsafe_allow_html=True)
 
 def scraper_donnees_coinaf(nbrepage,produits):
      
-    data = []  
+    data = []   
 
     for p in range(1,nbrepage+1):
         url = f'https://sn.coinafrique.com/categorie/{produits}?page={p}'
          
-        content_page  = get(url) # récupérere le contenu code de la page
-        soup = bs(content_page.text, "html.parser") # soup = le contenu de la page dans un objet beautifulSoup
+        content_page  = get(url) 
+        soup = bs(content_page.text, "html.parser")  
          
         containers = soup.find_all('div', class_ = 'col s6 m4 l3') 
 
-        for container in containers[:nbr_articles_page+1] :
-        #for container in containers:
+        for container in containers[:nbr_articles_page] :         
             try: 
                 url_container = "https://sn.coinafrique.com" + container.find('a')['href']
                 res_container = get(url_container)
@@ -162,19 +166,23 @@ if  choix == 'Tableau de bord':
     st.pyplot(plot2)
  
 elif choix=='Scraper Vetements homme': 
-    dtfrm = scraper_donnees_coinaf(nbre_pages,'vetements-homme') 
-    charger_dataframe(dtfrm,'Vetements-homme', 'Vétements pour Homme', '1', '11','BeautifulSoup')
+    with st.spinner('Scraping en cours...'):
+        dtfrm = scraper_donnees_coinaf(nbre_pages,'vetements-homme')     
+        charger_dataframe_BS(dtfrm,'Vetements-homme', 'Vétements pour Homme', '1', '11','BeautifulSoup')
 
 elif choix=='Scraper Chaussures homme': 
-    dtfrm = scraper_donnees_coinaf(nbre_pages,'chaussures-homme') 
-    charger_dataframe(dtfrm, 'chaussures-homme','Chaussurespour Homme', '2', '12','BeautifulSoup')   
+    with st.spinner('Scraping en cours...'):
+        dtfrm = scraper_donnees_coinaf(nbre_pages,'chaussures-homme') 
+        charger_dataframe_BS(dtfrm, 'chaussures-homme','Chaussurespour Homme', '2', '12','BeautifulSoup')   
 elif choix=='Scraper Vetements enfant': 
-    dtfrm = scraper_donnees_coinaf(nbre_pages,'vetements-enfants') 
-    charger_dataframe(dtfrm, 'vetements-enfants', 'Vetementspour enfants', '3', '13','BeautifulSoup')    
+    with st.spinner('Scraping en cours...'):   
+        dtfrm = scraper_donnees_coinaf(nbre_pages,'vetements-enfants') 
+        charger_dataframe_BS(dtfrm, 'vetements-enfants', 'Vetementspour enfants', '3', '13','BeautifulSoup')    
 
 elif choix=='Scraper Chaussures enfant': 
-    dtfrm = scraper_donnees_coinaf(nbre_pages,'chaussures-enfants') 
-    charger_dataframe(dtfrm,'chaussures-enfants', 'Chaussures pour enfants', '4', '14','BeautifulSoup')
+    with st.spinner('Scraping en cours...'):
+        dtfrm = scraper_donnees_coinaf(nbre_pages,'chaussures-enfants') 
+        charger_dataframe_BS(dtfrm,'chaussures-enfants', 'Chaussures pour enfants', '4', '14','BeautifulSoup')
 
 elif choix == 'Télécharger les données existantes': 
     dtfrm_chaus_enf = pd.read_csv('donnees/Chaussures_Enfant.csv', encoding='ISO-8859-1', sep=';', on_bad_lines='skip')
