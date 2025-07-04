@@ -9,33 +9,27 @@ import streamlit.components.v1 as components
 
 
 
-st.markdown("""<style>body {background-color: #0f926d;} .stApp { background-color: #0f926d; } </style>""", unsafe_allow_html=True)
-st.markdown("<h5 style='text-align: center; color: white';>🕷️ SCRAPING SUR COINAFRIQUE AVEC BEAUTIFULSOUP ET WEB-SCRAPER 🕷️</h5>", unsafe_allow_html=True) 
+st.markdown("""<style>body {background-color: #b2f7e9;} .stApp { background-color: #b2f7e9; } </style>""", unsafe_allow_html=True)
+st.markdown("<h5 style='text-align: center; color: Blue';>🕷️ SCRAPING SUR COINAFRIQUE AVEC BEAUTIFULSOUP ET WEB-SCRAPER 🕷️</h5>", unsafe_allow_html=True) 
 
-st.markdown(""" <style>
-            .main {
-                max-width: 95%;
-                padding-left: 3rem;
-                padding-right: 3rem;
-            }
-        </style>""", unsafe_allow_html=True)
 
-st.markdown(""" <style> section[data-testid="stSidebar"] {background-color: #b2f7e9; }  
-                 .sidebar-caption { position: relative; top: 200px;  font-size: 16px; text-align: center; color: #666; } 
+
+st.markdown(""" <style> section[data-testid="stSidebar"] {background-color: #0f926d; }  
+                 .sidebar-caption { position: relative; top: 200px;  font-size: 14px; text-align: center; color: white; } 
                 </style> """, unsafe_allow_html=True)
 
-st.sidebar.markdown( """ <div style='text-align: center; bottom: 30px;font-weight: bold; font-size: 20px;'>  <b> ☰  Menu</b>  </div> """, unsafe_allow_html=True)
- 
+st.sidebar.markdown( """ <div style='text-align: center; bottom: 30px;font-weight: bold; font-size: 20px; color: white; '>  <b> ☰  Menu</b>  </div> """, unsafe_allow_html=True)
+st.markdown(""" <style>  section[data-testid="stSidebar"] label { color: white; } </style> """, unsafe_allow_html=True)
+
 choix = st.sidebar.selectbox('Choisir une action', ['Tableau de bord','Scraper Vetements homme','Scraper Chaussures homme','Scraper Vetements enfant', 'Scraper Chaussures enfant','Télécharger les données existantes', 'Formulaire évalution'])
 nbre_pages = st.sidebar.selectbox('Nombre de pages', list([int(nbr) for nbr in np.arange(1, 350)]))
-nbr_articles_page = st.sidebar.number_input("Nombre max d'articles par page", min_value=10, max_value=100, value=10, step=1)
-
+nbr_articles_page = st.sidebar.number_input("Nombre max d'articles par page", min_value=5, max_value=100, value=10, step=1)
+ 
 st.sidebar.markdown("""
 <div class="sidebar-caption">
     <b><u>EXAMEN DATA COLLECTION</u></b> <br/>ABDOURAHMANE NDIAYE <br/> 📧 : ingndiaye@gmail.com
 </div>
 """, unsafe_allow_html=True) 
-
      
 def charger_dataframe(dataframe,nom_fichier, titre_bt, id_bt, key_bt_dwn,type_screping) :
     st.markdown(""" <style> div.stButton {text-align:center; } </style>""", unsafe_allow_html=True)
@@ -43,17 +37,10 @@ def charger_dataframe(dataframe,nom_fichier, titre_bt, id_bt, key_bt_dwn,type_sc
     if st.button(titre_bt,id_bt): 
 
         st.write('Données "'+titre_bt+'" Scrapées avec '+type_screping) 
+        st.write('Tailles des donnée: ' + str(dataframe.shape[0]) + ' ligne et ' + str(dataframe.shape[1]) + ' colonnes.')
         st.dataframe(dataframe)
-        st.write('Dimension des donnée: ' + str(dataframe.shape[0]) + ' ligne et ' + str(dataframe.shape[1]) + ' colonnes.')
 
-        st.download_button(
-            label='Télécharger les données',
-            data=dataframe.to_csv().encode('utf-8'),
-            file_name=nom_fichier+'.csv',
-            mime='text/csv',
-            key = key_bt_dwn)
-# définir quelques styles liés aux box
-st.markdown('''<style> .stButton>button {font-size: 12px; height: 3em; width: 23em;} .stButton>button:hover { background-color: #45a049; color: white; cursor: pointer;}</style>''', unsafe_allow_html=True)
+st.markdown('''<style> .stButton>button {font-size: 12px; height: 3em; width: 23em;} .stButton>button:hover { background-color: #0f926d; color: white; cursor: pointer;}</style>''', unsafe_allow_html=True)
 
 def scraper_donnees_coinaf(nbrepage,produits):
      
@@ -61,25 +48,22 @@ def scraper_donnees_coinaf(nbrepage,produits):
 
     for p in range(1,nbrepage+1):
         url = f'https://sn.coinafrique.com/categorie/{produits}?page={p}'
-        print(url)
+         
         content_page  = get(url) # récupérere le contenu code de la page
         soup = bs(content_page.text, "html.parser") # soup = le contenu de la page dans un objet beautifulSoup
-        
-        
-        containers = soup.find_all('div', class_ = 'col s6 m4 l3')
-        print("conteneur",len(containers))
+         
+        containers = soup.find_all('div', class_ = 'col s6 m4 l3') 
 
         for container in containers[:nbr_articles_page+1] :
         #for container in containers:
-            try:
-                print("de dans") 
+            try: 
                 url_container = "https://sn.coinafrique.com" + container.find('a')['href']
                 res_container = get(url_container)
                 soup_container = bs(res_container.text, "html.parser")
                  
                 #Titre de l'annonce
                 detail = container.find('p', class_ = "ad__card-description").text
-                print(detail)
+                 
                 #Prix du produit
                 try :
                      price = soup_container.find('p', class_='price').text.replace("CFA", "").replace(" ", "")
